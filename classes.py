@@ -63,6 +63,9 @@ class User :
     def get_id(self) -> int :
         return self.id
 
+    def get_chats_ids(self) -> list :
+        return self.chats_ids
+
     def get_reg_date(self) -> DateTime :
         return self.reg_date
 
