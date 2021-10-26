@@ -1,0 +1,28 @@
+.chats {
+    width: 20%;
+    margin-left: 2%;
+    margin-top: 3vh;
+    background-color: aliceblue;
+    border: 1px solid brown;
+    border-radius: 1px;
+    flex: 0 auto;
+    overflow-y: scroll;
+    height: 92vh;
+}
+
+a, h3 {
+    margin: 0;
+    padding: 0;
+}
+
+.one_of_chats {
+    margin-left: 5%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+    margin-right: 1%;
+    cursor: default;
+}
+
+.one_of_chats:hover {
+    background-color: #eee;
+}

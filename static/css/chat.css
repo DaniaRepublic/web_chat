@@ -1,0 +1,83 @@
+.chat {
+    width: 50%;
+    margin: auto;
+    border: 3px solid antiquewhite;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: column;
+    flex: 0 auto;
+    margin-left: 2%;
+    margin-top: 3vh;
+    height: 92vh;
+}
+
+.chat > div {
+    flex: 1 1 auto;
+}
+
+.messages {
+    overflow-y: scroll;
+    height: calc(100vh - 8vh);
+    background-color: ghostwhite;
+}
+
+.message_field {
+    text-align: right;
+    padding: 2% 3%;
+    background-color: antiquewhite;
+}
+
+.my_name, .my_msg {
+    text-align: right;
+    font-weight: 100;
+    margin: 2% 0;
+}
+
+.my_name {
+    text-decoration: underline #659065 1.6px;
+}
+
+.not_my_name, .not_my_msg {
+    text-align: left;
+    font-weight: 100;
+    margin: 2% 0;
+}
+
+.not_my_name {
+    text-decoration: underline #956095 1.6px;
+}
+
+.user_msg {
+    margin-right: 2%;
+    margin-left: 16%;
+}
+
+.not_user_msg {
+    margin-right: 16%;
+    margin-left: 2%;
+}
+
+.form {
+    height: 100%;
+}
+
+.send {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.text {
+    width: 75%;
+    margin-right: 5%;
+    border: none;
+    border-radius: 2px;
+}
+
+.button {
+    width: 15%;
+    background-color: white;
+    border: none;
+    border-radius: 2px;
+}
