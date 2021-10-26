@@ -9,130 +9,38 @@ class ChatService :
 
     def __init__(self, conn) -> None:
         self.conn = conn
-        self.chats_header = '''
-        <!DOCTYPE html>
-            <html>
-                <head>
-                    <title>Chats page</title>
-                </head>
-                <body>
+        self.get_static_content = lambda tag_name, f_path : f'''
+        <{ tag_name }>
+        { open(f'static/{f_path}', 'r').read() }
+        </{ tag_name }>
         '''
-        self.chats_bottom = '''
-                </body>
-            </html>
+        self.home_header = f'''
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Home page</title>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+            </head>
+            <body>
+            {self.get_static_content("style", "css/chat.css")}
+            {self.get_static_content("style", "css/chats.css")}
+            {self.get_static_content("style", "css/home.css")}
+            <div class="chats_and_chat">
+        '''
+        self.home_bottom = f'''
+            </div>
+            {self.get_static_content("script", "js/chat.js")}
+            {self.get_static_content("script", "js/select_chat_ajax.js")}
+            </body>
+        </html>
         '''
         self.msg_field = '''
         <div class='message_field'>
-            <form method="POST" class="form" onsubmit="return check_input()">
+            <form method="POST" class="form">
                     <input type="text" id="message" name="message" class="send text" minlength="1">
                     <input type="submit" value="Send" class="send button">
             </form>
         </div>
-        '''
-        self.chats_script = '''
-        <script>
-            var msgs_field = document.getElementById("messages");
-            msgs_field.scrollTop = msgs_field.scrollHeight;
-
-            function check_input() {
-                var msg = document.getElementById("message").value;
-                if ((msg.replace(/ /g, '') != '') && msg) {
-                    return true;
-                }
-                return false;
-            }
-        </script>
-        '''
-        self.chats_style = '''
-        <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .chat {
-            height: 98%;
-            width: 50%;
-            margin: auto;
-            border: 3px solid antiquewhite;
-            border-radius: 4px;
-            box-sizing: border-box;
-            display: flex;
-            flex-flow: column;
-        }
-
-        .chat > div {
-            flex: 1 1 auto;
-        }
-
-        .messages {
-            overflow-y: scroll;
-            height: calc(100vh - 8vh);
-            background-color: ghostwhite;
-        }
-
-        .message_field {
-            text-align: right;
-            padding: 2% 3%;
-            background-color: antiquewhite;
-        }
-
-        .my_name, .my_msg {
-            text-align: right;
-            font-weight: 100;
-            margin: 2% 0;
-        }
-
-        .my_name {
-            text-decoration: underline #659065 1.6px;
-        }
-
-        .not_my_name, .not_my_msg {
-            text-align: left;
-            font-weight: 100;
-            margin: 2% 0;
-        }
-
-        .not_my_name {
-            text-decoration: underline #956095 1.6px;
-        }
-
-        .user_msg {
-            margin-right: 2%;
-            margin-left: 16%;
-        }
-
-        .not_user_msg {
-            margin-right: 16%;
-            margin-left: 2%;
-        }
-
-        .form {
-            height: 100%;
-        }
-
-        .send {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-        }
-
-        .text {
-            width: 75%;
-            margin-right: 5%;
-            border: none;
-            border-radius: 2px;
-        }
-
-        .button {
-            width: 15%;
-            background-color: white;
-            border: none;
-            border-radius: 2px;
-        }
-        </style>
         '''
         
 
@@ -142,21 +50,25 @@ class ChatService :
         for chat_id in chats_ids :
             chats.append(self.conn.execute(query, {'id': chat_id}).fetchone())
 
-        html = ''
+        html = "<div class='chats'>"
         for chat in chats :
             chat_html = f'''
-            <div class='one-of-chats'>
-                <a href="/chat/{chat[0]}">
-                    <h3>{chat[1]}<h3>
-                </a>
-            </div>
+                <div class="one_of_chats" id="{chat[0]}">
+                    <h3>{chat[1]}</h3>
+                </div>
             '''
             html += chat_html
 
-        return self.chats_header + html + self.chats_bottom
+        html += '</div>'
+
+        return html
 
     
-    def get_chat_html(self, chat_id : int, user_id : int) -> str :
+    def get_chat_msgs_html(self, chat_id : int, user_id : int) -> str :
+        html = "<div class='messages' id='messages'>"
+        if (chat_id == -1) and (user_id == -1):
+            return  html + '</div>' 
+
         # Get chat info
         query = text('SELECT * FROM `chat` WHERE `id`=:id;')
         res = self.conn.execute(query, {'id': chat_id}).fetchone()
@@ -177,7 +89,6 @@ class ChatService :
         msgs = self.conn.execute(query, {'chat_id': chat_id}).fetchall()
 
         # Create html
-        html =  "<div class='chat'><div class='messages' id='messages'>"
         for msg in msgs :
             msg_user_id = msg[2]
 
@@ -195,18 +106,32 @@ class ChatService :
             msg_html = f'''
             <div class='{ msg_class }'>
                 <h3 class='{name_class}'>{ name }</h3>
-                <h3 class='{text_class}'>{ msg[3] }</h2>
+                <h3 class='{text_class}'>{ msg[3] }</h3>
             </div>
             <br>
             '''
 
             html += msg_html
         
-        html += '</div>' + self.msg_field + '</div>'
+        html += '</div>'
         
-        return self.chats_header + self.chats_style + html + self.chats_script + self.chats_bottom
+        # Return final html 
+        return html
+    
+
+    def get_home(self, chats_ids : list) -> str :
+        chats = self.get_chats_html(chats_ids)
+        chat = "<div class='chat' id='chat'>" + self.get_chat_msgs_html(-1, -1) + self.msg_field + "</div>"
+        return self.home_header + chats + chat + self.home_bottom
 
     
-    def save_message(self, chat_id, user_id, msg_text) :
+    def save_message(self, chat_id, user_id, msg_text) -> str :
         query = text('INSERT INTO `message` (`chat_id`, `user_id`, `text`) VALUES (:chat_id, :user_id, :text);')
         self.conn.execute(query, {'chat_id': chat_id, 'user_id': user_id, 'text': msg_text})
+        return f''' 
+            <div class='user_msg'>
+                <h3 class='my_name'>You</h3>
+                <h3 class='my_msg'>{ msg_text }</h3>
+            </div>
+            <br>
+            '''

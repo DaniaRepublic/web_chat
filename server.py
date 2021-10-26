@@ -7,12 +7,17 @@ from server_utils.ClientService import *
 
 # GLOBAL CONSTANTS
 HOST = '127.0.0.1'
-PORT = 8000
+PORT = 8080
 ADDR = (HOST, PORT)
 
 # SERVER SOCKET
-serv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-serv_sock.bind(ADDR)
+try:
+    serv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    serv_sock.bind(ADDR)
+except Exception as e:
+    serv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    serv_sock.bind((HOST, 0))
+    ADDR = serv_sock.getsockname()
 
 # DB CONNECTION
 conn_pool = DBConnector()
@@ -33,7 +38,7 @@ class ClientThread(threading.Thread):
 
 def accept_conns(serv_sock : socket.socket, n_conns : int) -> None :
     serv_sock.listen(n_conns)
-    print(f'[START] Server started at { ADDR }.')
+    print(f'[START] Server started at { ADDR[0] }:{ ADDR[1] }/')
 
     while True :
         print('[WAITING] Waiting for connection.')

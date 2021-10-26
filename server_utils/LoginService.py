@@ -11,10 +11,16 @@ class LoginService :
 
     def __init__(self) -> None:
         self.user_logged_in = False
+        self.get_static_content = lambda tag_name, f_path : f'''
+        <{ tag_name }>
+        {
+            open(f'static/{f_path}', 'r').read()
+        }
+        </{ tag_name }>
+        '''
         
 
-    @staticmethod
-    def get_html(prefix) -> str :
+    def get_html(self, prefix) -> str :
         return f'''
             <!DOCTYPE html>
             <html>
@@ -22,15 +28,18 @@ class LoginService :
                     <title>Register page</title>
                 </head>
                 <body>
-                    <div class="center-block">
-                        {''.join([f'<h3>{prefix}</h3>' for _ in [1] if prefix])}
-                        <form method="POST">
-                            <label for="name">Name:</label>
-                            <input type="text" id="name" name="name"><br><br>
-                            <label for="pass">Password:</label>
-                            <input type="text" id="pass" name="pass"><br><br>
-                            <input type="submit" value="Submit">
-                        </form>
+                    {self.get_static_content("style", "css/login.css")}
+                    <div class="wrapper">
+                        <div class="center-block">
+                            {''.join([f'<h3>{prefix}</h3>' for _ in [1] if prefix])}
+                            <form method="POST">
+                                <label for="name">Name</label><br>
+                                <input type="text" id="name" name="name"><br><br>
+                                <label for="pass">Password</label><br>
+                                <input type="text" id="pass" name="pass"><br><br>
+                                <input type="submit" id="submit" value="SUBMIT">
+                            </form>
+                        </div>
                     </div>
                 </body>
             </html>
